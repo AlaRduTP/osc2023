@@ -4,7 +4,7 @@ read QEMU_PTY \
     | awk '{print $5}')
 echo "QEMU serial port is attached to $QEMU_PTY"
 
-tmux new -d \; \
+tmux new \; \
      splitw -h \; \
      splitw -v \; \
      selectp -t 0 \; \
@@ -12,8 +12,7 @@ tmux new -d \; \
      selectp -t 2 \; \
      send 'clear' C-m \; \
      selectp -t 1 \; \
-     send 'bash' C-m "clear; while true; do read -p 'Press enter to load kernel ...'; ./$2 $QEMU_PTY; done" C-m \; \
-     attach
+     send 'bash' C-m "clear; while true; do read -p 'Press enter to load kernel ...'; ./$2 $QEMU_PTY; done" C-m
 
 read QEMU_DEAMON \
     < <(ps -eo 'tty ppid pid command' \
