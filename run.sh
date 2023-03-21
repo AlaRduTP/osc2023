@@ -19,5 +19,5 @@ read QEMU_DEAMON \
     | grep -i '^?.*qemu' \
     | awk '{print $3}')
 
-kill -9 $QEMU_DEAMON
-echo "QEMU deamon is killed (pid: $QEMU_DEAMON)"
+kill -9 $QEMU_DAEMON
+echo "QEMU daemon is killed (pid: $QEMU_DAEMON)"
