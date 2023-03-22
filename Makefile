@@ -1,7 +1,7 @@
 export PATH := /usr/local/opt/llvm/bin:$(PATH)
 
-SRC := $(wildcard src/*/*.c) $(wildcard src/*.c)
-OBJ := $(SRC:.c=.o) head.o
+SRC := $(wildcard src/*/*.c src/*.c src/*/*.S src/*.S)
+OBJ := $(patsubst %.S,%.o,$(SRC:.c=.o))
 
 IMG := kernel8.img
 ELF := $(IMG:.img=.elf)
@@ -35,10 +35,10 @@ $(IMG): $(ELF)
 $(ELF): $(OBJ)
 	ld.lld $(LDF) -o $@ $^
 
-head.o: head.S
-	clang $(CFLAGS) -c $<
-
 %.o: %.c
+	clang $(CFLAGS) $(CINCLD) -c $< -o $@
+
+%.o: %.S
 	clang $(CFLAGS) $(CINCLD) -c $< -o $@
 
 $(BTLDER):
