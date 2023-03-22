@@ -13,5 +13,6 @@ struct file {
 
 int read(struct file * file, char * buf, unsigned int n);
 int write(struct file * file, char * buf, unsigned int n);
+void pfile(struct file * file);
 
 #endif

@@ -8,13 +8,6 @@
 
 static char * _ramfs_addr = 0;
 
-static inline void _ramfs_cat(struct file * file) {
-    char c;
-    while (read(file, &c, 1)) {
-        uart_send(c);
-    }
-}
-
 static void _callback(struct fdt_node * node) {
     struct fdt_prop * prop = node->prpty;
     while (prop) {
@@ -59,7 +52,7 @@ void ramfs_cat(char * filename) {
         if (!strcmp(cpio_file.name, filename)) {
             struct file file;
             cpio_open(&cpio_file, &file);
-            return _ramfs_cat(&file);
+            return pfile(&file);
         }
     }
     uart_puts(filename);

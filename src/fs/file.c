@@ -1,3 +1,4 @@
+#include "bcm2835/uart.h"
 #include "fs/file.h"
 
 int read(struct file * file, char * buf, unsigned int n) {
@@ -12,4 +13,11 @@ int write(struct file * file, char * buf, unsigned int n) {
         return FILE_EOPNULL;
     }
     return file->write(file->_f, buf, n);
+}
+
+void pfile(struct file * file) {
+    char c;
+    while (read(file, &c, 1)) {
+        uart_send(c);
+    }
 }
