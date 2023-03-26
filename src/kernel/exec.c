@@ -1,6 +1,6 @@
+#include "bcm2835/el.h"
 #include "bcm2835/uart.h"
 #include "init/ramfs.h"
-#include "kernel/el.h"
 #include "kernel/exec.h"
 #include "kernel/ml.h"
 
