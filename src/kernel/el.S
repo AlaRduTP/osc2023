@@ -1,7 +1,5 @@
 #include "kernel/ml.h"
 
-#define CORE0_TIMER_IRQ_CTRL 0x40000040
-
 .section ".text"
 .global el21
 
@@ -19,9 +17,11 @@ el21:
     ERET
 
 .extern evt
+.extern cntp_enable
 .global el10
 
-// switch exception level from 1 to 0
+// switch exception level from 1 to 0,
+// enable CPU time counter
 // and branch to the user program
 el10:
     MSR     elr_el1, x0
@@ -35,12 +35,5 @@ el10:
     MSR     vbar_el1, x1
     MOV     x1, #ML_U_STACK_TOP
     MSR     sp_el0, x1
-    // enable coer timer
-    MOV     x0, #1
-    MSR     cntp_ctl_el0, x0
-    MRS     x0, cntfrq_el0
-    MSR     cntp_tval_el0, x0
-    MOV     x0, #2
-    LDR     x1, =CORE0_TIMER_IRQ_CTRL
-    STR     w0, [x1]
+    BL      cntp_enable
     ERET
