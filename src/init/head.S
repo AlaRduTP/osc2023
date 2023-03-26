@@ -3,6 +3,13 @@
 .global _start
 
 _start:
+    // freeze cpu if cpu id != 0
+    MRS     x1, mpidr_el1
+    AND     x1, x1, #3
+    CBNZ    x1, 3f
+
+    BL      el21
+
     // init .bss
     LDR     x1, =__sbss
     LDR     x2, =__bss_size

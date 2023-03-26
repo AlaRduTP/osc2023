@@ -6,6 +6,15 @@
 #include "string.h"
 #include "utils.h"
 
+#define ramfs_traverse(cpiof) {\
+    struct cpio _cpio; \
+    char * _addr = ramfs_addr(); \
+    cpio_open_archive(&_cpio, _addr, CPIO_NEWC); \
+    while (cpio_read_archive(&_cpio) != CPIO_EARCHIVE) { \
+        struct cpio_file cpiof; \
+        cpio_extract(&_cpio, &cpiof);
+#define _end }}
+
 static char * _ramfs_addr = 0;
 
 static void _callback(struct fdt_node * node) {
@@ -31,30 +40,39 @@ static inline char * ramfs_addr() {
 }
 
 void ramfs_ls() {
-    struct cpio cpio;
-    char * addr = ramfs_addr();
-    cpio_open_archive(&cpio, addr, CPIO_NEWC);
-    while (cpio_read_archive(&cpio) != CPIO_EARCHIVE) {
-        struct cpio_file file;
-        cpio_extract(&cpio, &file);
+    ramfs_traverse(file) {
         uart_puts(file.name);
         uart_send('\n');
-    }
+    } _end;
 }
 
 void ramfs_cat(char * filename) {
-    struct cpio cpio;
-    char * addr = ramfs_addr();
-    cpio_open_archive(&cpio, addr, CPIO_NEWC);
-    while (cpio_read_archive(&cpio) != CPIO_EARCHIVE) {
-        struct cpio_file cpio_file;
-        cpio_extract(&cpio, &cpio_file);
+    ramfs_traverse(cpio_file) {
         if (!strcmp(cpio_file.name, filename)) {
             struct file file;
             cpio_open(&cpio_file, &file);
             return pfile(&file);
         }
-    }
+    } _end;
     uart_puts(filename);
     uart_puts(": file not found\n");
+}
+
+static inline void _ramfs_load(struct file * file, char * addr) {
+    char c;
+    while (read(file, &c, 1)) {
+        *(addr++) = c;
+    }
+}
+
+int ramfs_load(char * filename, void * addr) {
+    ramfs_traverse(cpio_file) {
+        if (!strcmp(cpio_file.name, filename)) {
+            struct file file;
+            cpio_open(&cpio_file, &file);
+            _ramfs_load(&file, (char *)addr);
+            return 1;
+        }
+    } _end;
+    return 0;
 }

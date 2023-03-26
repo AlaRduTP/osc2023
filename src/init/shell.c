@@ -2,10 +2,12 @@
 #include "init/fdt.h"
 #include "init/ramfs.h"
 #include "init/shell.h"
+#include "kernel/exec.h"
 #include "string.h"
 
 #define SHELL_ST_NORMAL 0x0U
 #define SHELL_ST_CAT    0x1U
+#define SHELL_ST_EXEC   0x2U
 
 #define PM_MGIC 0x5A000000U
 #define PM_RSTC PRPHRL(0x10001C)
@@ -81,6 +83,7 @@ static inline unsigned int shell_exec(char * cmd) {
     } else if (!strcmp(cmd, "help")) {
         uart_puts("cat:     print a ramdisk file's content\n");
         uart_puts("dt:      print device tree\n");
+        uart_puts("exec:    execute a user program\n");
         uart_puts("help:    print this help menu\n");
         uart_puts("hello:   print Hello World!\n");
         uart_puts("ls:      list files in the ramdisk\n");
@@ -90,6 +93,9 @@ static inline unsigned int shell_exec(char * cmd) {
         return SHELL_ST_CAT;
     } else if (!strcmp(cmd, "dt")) {
         fdt_traverse(print_dt_callback, print_dt_cmp);
+    } else if (!strcmp(cmd, "exec")) {
+        uart_puts("filename: ");
+        return SHELL_ST_EXEC;
     } else if (!strcmp(cmd, "hello")) {
         uart_puts("Hello World!\n");
     } else if (!strcmp(cmd, "ls")) {
@@ -110,7 +116,10 @@ static inline unsigned int shell_exec_state(char * line, unsigned int state) {
     switch (state) {
     case SHELL_ST_CAT:
         ramfs_cat(line);
-        return SHELL_ST_NORMAL;
+        break;
+    case SHELL_ST_EXEC:
+        exec(line);
+        break;
     }
     return SHELL_ST_NORMAL;
 }
