@@ -1,8 +1,8 @@
 #include "bcm2835/uart.h"
 #include "init/fdt.h"
 #include "init/salloc.h"
-#include "string.h"
-#include "utils.h"
+#include "lib/string.h"
+#include "lib/utils.h"
 
 #define align4(x) (((unsigned int)(x) + 3U) & (~3U))
 #define peek(x)   (load_big32u(x))

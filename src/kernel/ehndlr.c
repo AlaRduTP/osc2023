@@ -1,6 +1,6 @@
 #include "bcm2835/cntp.h"
 #include "bcm2835/uart.h"
-#include "utils.h"
+#include "lib/utils.h"
 
 void _svc_hndlr() {
     unsigned int spsr;

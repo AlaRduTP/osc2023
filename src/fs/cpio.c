@@ -1,5 +1,5 @@
 #include "fs/cpio.h"
-#include "string.h"
+#include "lib/string.h"
 
 #define align4(x) (((unsigned int)(x) + 3U) & (~3U))
 #define newc_filename(a) ((char *)(a) + sizeof(struct cpio_newc))

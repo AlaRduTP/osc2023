@@ -3,7 +3,7 @@
 #include "init/ramfs.h"
 #include "init/shell.h"
 #include "kernel/exec.h"
-#include "string.h"
+#include "lib/string.h"
 
 #define SHELL_ST_NORMAL 0x0U
 #define SHELL_ST_CAT    0x1U

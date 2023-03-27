@@ -1,4 +1,4 @@
-#include "string.h"
+#include "lib/string.h"
 
 char strcmp(char * s, char * t) {
     while (*s && *t && *s == *t) {

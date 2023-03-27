@@ -3,8 +3,8 @@
 #include "fs/file.h"
 #include "init/fdt.h"
 #include "init/ramfs.h"
-#include "string.h"
-#include "utils.h"
+#include "lib/string.h"
+#include "lib/utils.h"
 
 #define ramfs_traverse(cpiof) {\
     struct cpio _cpio; \
