@@ -4,6 +4,7 @@
 #include "init/shell.h"
 #include "kernel/exec.h"
 #include "lib/string.h"
+#include "lib/queue.h"
 
 #define SHELL_ST_NORMAL 0x0U
 #define SHELL_ST_CAT    0x1U
@@ -13,37 +14,10 @@
 #define PM_RSTC PRPHRL(0x10001C)
 #define PM_WDOG PRPHRL(0x100024)
 
-#define SBUF_SIZE 0x100
-
-#define sbuf_empty(x) ((x)->i == (x)->o)
-
-struct sbuf {
-    unsigned int i;
-    unsigned int o;
-    char b[SBUF_SIZE];
-};
-
-static inline void sbuf_push(struct sbuf * buf, char c) {
-    buf->b[buf->i] = c;
-    buf->i = (buf->i + 1) % SBUF_SIZE;
-    if (sbuf_empty(buf)) {
-        buf->o = (buf->o + 1) % SBUF_SIZE;
-    }
-}
-
-static inline char sbuf_pop(struct sbuf * buf) {
-    if (sbuf_empty(buf)) {
-        return '\0';
-    }
-    char c = buf->b[buf->o];
-    buf->o = (buf->o + 1) % SBUF_SIZE;
-    return c;
-}
-
-static inline void sbuf_getline(struct sbuf * buf, char * line) {
+static inline void shell_getline(struct cbuf * buf, char * line) {
     unsigned int i = 0;
-    while (!sbuf_empty(buf)) {
-        char c = sbuf_pop(buf);
+    while (!cbuf_empty(buf)) {
+        char c = cbuf_pop(buf);
         if (c == '\n') {
             break;
         }
@@ -125,8 +99,8 @@ static inline unsigned int shell_exec_state(char * line, unsigned int state) {
 }
 
 void shell_start() {
-    struct sbuf buf;
-    buf.i = buf.o = 0;
+    struct cbuf buf;
+    cbuf_init(&buf, CBUF_OVERWRITE);
 
     unsigned int state = SHELL_ST_NORMAL;
 
@@ -134,10 +108,10 @@ void shell_start() {
     do {
         char c = uart_recv();
         uart_send(c);
-        sbuf_push(&buf, c);
+        cbuf_push(&buf, c);
         if (c == '\n') {
-            char line[SBUF_SIZE];
-            sbuf_getline(&buf, line);
+            char line[CBUF_SIZE];
+            shell_getline(&buf, line);
             if (state == SHELL_ST_NORMAL) {
                 state = shell_exec(line);
             } else {

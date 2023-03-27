@@ -1,5 +1,5 @@
-#ifndef _UTILS
-#define _UTILS
+#ifndef _UTILS_H
+#define _UTILS_H
 
 // get the lower 32-bit of a system register
 #define get32sys(v, s) {\
